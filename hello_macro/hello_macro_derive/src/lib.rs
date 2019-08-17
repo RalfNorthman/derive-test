@@ -13,19 +13,21 @@ pub fn hello_macro_derive(input: TokenStream) -> TokenStream {
     impl_hello_macro(&ast)
 }
 
+fn module(name: &str, ast: &syn::DeriveInput) -> syn::Ident {
+    let attrs = &ast.attrs;
+    let module_name: String =
+        syn_util::get_attribute_value(attrs, &[name]).expect("The attribute was not found");
+    syn::Ident::new(&module_name, Span::call_site())
+}
+
 fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
-    let attrs = &ast.attrs;
-    let my_attr: String = syn_util::get_attribute_value(attrs, &["my_custom_attribute"])
-        .expect("Attribute not found");
-    let module_name = format!("__{}_mod__", my_attr);
-    let module = syn::Ident::new(&module_name, Span::call_site());
+    let module = module("my_custom_attribute", ast);
     let gen = quote! {
         impl HelloMacro for #name {
             fn hello_macro() {
                 println!("Hello, Macro! My name is {}",
                          stringify!(#name));
-                println!("{}", stringify!(#my_attr));
                 #module::inside_func();
             }
         }
