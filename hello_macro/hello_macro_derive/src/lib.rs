@@ -1,7 +1,7 @@
 extern crate proc_macro;
 
 use crate::proc_macro::TokenStream;
-use proc_macro2::{Ident, Span};
+use proc_macro2;
 use quote::quote;
 use syn;
 use syn_util;
@@ -17,7 +17,7 @@ fn module(name: &str, ast: &syn::DeriveInput) -> syn::Ident {
     let attrs = &ast.attrs;
     let module_name: String =
         syn_util::get_attribute_value(attrs, &[name]).expect("The attribute was not found");
-    syn::Ident::new(&module_name, Span::call_site())
+    syn::Ident::new(&module_name, proc_macro2::Span::call_site())
 }
 
 fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
